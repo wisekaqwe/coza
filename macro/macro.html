@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Coin Flip</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header" style="text-align: center">            
+            <h1>Coin Flip</h1>
+        </div>
+        <div class="container theme-showcase" role="main">
+            <div class="row">
+                <div class="col-md-12" style="width: 80%; margin: 20px; margin-left: 100px;">
+                    <input id="private_key" type="text" class="form-control" placeholder="private key">
+                </div>
+                <div class="col-md-12" style="width: 50%; margin: 20px; margin-left: 100px;">
+                    <input id="wallet_address" type="text" class="form-control" placeholder="wallet address">
+                </div>
+                <div class="col-md-4" style="float: left;width:30%; ">
+                    <button id="coinBtn" type="button" class="btn btn-default" style="margin-left: 140px;display: inline-block;">
+                        COIN
+                    </button>
+                </div>
+                <div class="col-md-4" style="float: left;width:10%; ">
+                    <button id="diceBtn" type="button" class="btn btn-default" style="display: inline-block; ">
+                        DICE
+                    </button>
+                </div>
+                <div class="col-md-4" style="float: left;">
+                    <button id="cardBtn" type="button" class="btn btn-default" style="display: inline-block;">
+                        CARD
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/gh/icon-project/icon-sdk-js@latest/build/icon-sdk-js.web.min.js"></script>
+    <script>
+        var IconService = window['icon-sdk-js']
+
+        const { HttpProvider, IconBuilder, IconWallet, IconAmount, IconConverter } = IconService
+        const provider = new HttpProvider('https://ctz.solidwallet.io/api/v3')
+        const iconService = new IconService(provider)
+
+
+        var requestAddress = document.getElementById("request-address")
+        var responseAddress = document.getElementById("response-address")
+        var balanceRemain = document.getElementById("balance-remain")
+        var ppk = document.getElementById("private_key")
+        var address = document.getElementById("wallet_address")
+        var coinBtn = document.getElementById("coinBtn")
+        var diceBtn = document.getElementById("diceBtn")
+        var cardBtn = document.getElementById("cardBtn")
+
+        var coin = -1
+        var balance = undefined
+        var fromAddress = ''
+        var result = ''
+        var betresult = undefined
+
+        coinBtn.onclick = async function () {
+            console.log('before builder ')
+            console.log('private key: ' + ppk.value)
+            console.log('wallet address: ' + address.value)
+
+            var wallet = IconWallet.loadPrivateKey(ppk.value);
+
+
+            for (var i = 0; i < 200; i++) {
+                var txObj = new IconBuilder.IcxTransactionBuilder()
+                var txObjData = txObj.from(address.value)
+                .to("cx142be5eff783a9243ca49fb8c46f7613e3d486e9")
+                .value(IconAmount.of(0.001, IconAmount.Unit.ICX).toLoop())
+                .stepLimit(IconConverter.toBigNumber(1000000))
+                .nid(IconConverter.toBigNumber(1))
+                .nonce(IconConverter.toBigNumber(1))
+                .version(IconConverter.toBigNumber(3))
+                .timestamp((new Date()).getTime() * 1000)
+                .build()
+                console.log("for loop : "+ i)
+                var signedTransaction = new IconService.SignedTransaction(txObjData, wallet)
+                var txHash = await iconService.sendTransaction(signedTransaction).execute();
+                console.log(txHash)
+            }
+        }
+
+
+        diceBtn.onclick = async function () {
+            console.log('before builder ')
+            console.log('private key: ' + ppk.value)
+            console.log('wallet address: ' + address.value)
+
+            var wallet = IconWallet.loadPrivateKey(ppk.value);
+
+
+            for (var i = 0; i < 200; i++) {
+                var callTransactionBuilder = new IconBuilder.CallTransactionBuilder()
+                var callTransactionData = callTransactionBuilder
+                    .from(address.value)
+                    .to("cx9f317c422758e6401a6bc47ff7d698ddfdb4bdae")
+                    .nid(IconConverter.toBigNumber(1))
+                    .nonce(IconConverter.toBigNumber(1))
+                    .timestamp((new Date()).getTime() * 1000)
+                    .stepLimit(IconConverter.toBigNumber('10000000'))
+                    .version(IconConverter.toBigNumber('3'))
+                    .method('bet')
+                    .params({
+                        bet: '1' //배열
+                    })
+                    .build()
+                console.log("for loop : " + i)
+                var signedTransaction = new IconService.SignedTransaction(callTransactionData, wallet)
+                var txHash = await iconService.sendTransaction(signedTransaction).execute();
+                console.log(txHash)
+            }
+        }
+
+        cardBtn.onclick = async function () {
+            console.log('before builder ')
+            console.log('private key: ' + ppk.value)
+            console.log('wallet address: ' + address.value)
+
+            var wallet = IconWallet.loadPrivateKey(ppk.value);
+
+            for (var i = 0; i < 200; i++) {
+                var callTransactionBuilder = new IconBuilder.CallTransactionBuilder()
+                var callTransactionData = callTransactionBuilder
+                    .from(address.value)
+                    .to("cx288b4741620ccb6f2f9d26f0d02b606ed1181d95")
+                    .nid(IconConverter.toBigNumber(1))
+                    .nonce(IconConverter.toBigNumber(1))
+                    .timestamp((new Date()).getTime() * 1000)
+                    .stepLimit(IconConverter.toBigNumber('10000000'))
+                    .version(IconConverter.toBigNumber('3'))
+                    .method('bet')
+                    .params({
+                        bet: '1' //배열
+                    })
+                    .build()
+                console.log("for loop : " + i)
+                var signedTransaction = new IconService.SignedTransaction(callTransactionData, wallet)
+                var txHash = await iconService.sendTransaction(signedTransaction).execute();
+                console.log(txHash)
+            }
+        }
+
+
+    </script>
+</body>
+
+</html>
+
